@@ -6,12 +6,15 @@ import com.android.build.api.transform.Transform
 import com.android.build.api.transform.TransformInvocation
 import com.android.build.gradle.AppExtension
 import com.android.build.gradle.internal.pipeline.TransformManager
-import com.android.utils.FileUtils
+import org.apache.commons.io.FileUtils
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.objectweb.asm.ClassReader
-import org.objectweb.asm.ClassWriter
+import org.objectweb.asm.*
+import org.objectweb.asm.Opcodes.ASM7
+import java.io.File
+import java.io.FileInputStream
 import java.io.FileOutputStream
+import java.io.IOException
 
 
 class DemoTransform : Transform(), Plugin<Project> {
@@ -38,66 +41,119 @@ class DemoTransform : Transform(), Plugin<Project> {
         return false
     }
 
-    override fun transform(transformInvocation: TransformInvocation?) {
+    override fun transform(transformInvocation: TransformInvocation) {
         super.transform(transformInvocation)
 
-        val inputs = transformInvocation?.inputs
-        val outputProvider = transformInvocation?.outputProvider
+        //消费型输入，可以从中获取jar包和class文件夹路径。需要输出给下一个任务
+        val inputs = transformInvocation.inputs
 
-        if (!isIncremental) {
-            outputProvider?.deleteAll()
-        }
+        //OutputProvider管理输出路径，如果消费型输入为空，你会发现OutputProvider == null
+        val outputProvider = transformInvocation.outputProvider
 
-        inputs?.forEach { it ->
-            it.directoryInputs.forEach {
-                if (it.file.isDirectory) {
-                    FileUtils.getAllFiles(it.file).forEach {
-                        val file = it
-                        val name = file.name
-                        if (name.endsWith(".class") && name != ("R.class")
-                                && !name.startsWith("R\$") && name != ("BuildConfig.class")
-                        ) {
 
-                            val classPath = file.absolutePath
-                            println(">>>>>> classPath :$classPath")
-
-                            val cr = ClassReader(file.readBytes())
-                            val cw = ClassWriter(cr, ClassWriter.COMPUTE_MAXS)
-                            val visitor = DemoClassVisitor(cw)
-                            cr.accept(visitor, ClassReader.EXPAND_FRAMES)
-
-                            val bytes = cw.toByteArray()
-
-                            val fos = FileOutputStream(classPath)
-                            fos.write(bytes)
-                            fos.close()
-                        }
-                    }
-                }
-
-                val dest = outputProvider?.getContentLocation(
-                        it.name,
-                        it.contentTypes,
-                        it.scopes,
-                        Format.DIRECTORY
-                )
-                FileUtils.copyDirectoryToDirectory(it.file, dest)
+        for (input in inputs) {
+            for (jarInput in input.jarInputs) {
+                val dest = outputProvider.getContentLocation(
+                        jarInput.file.absolutePath,
+                        jarInput.contentTypes,
+                        jarInput.scopes,
+                        Format.JAR)
+                //将修改过的字节码copy到dest，就可以实现编译期间干预字节码的目的了
+                transformJar(jarInput.file, dest)
             }
 
-            //  !!!!!!!!!! !!!!!!!!!! !!!!!!!!!! !!!!!!!!!! !!!!!!!!!!
-            //使用androidx的项目一定也注意jar也需要处理，否则所有的jar都不会最终编译到apk中，千万注意
-            //导致出现ClassNotFoundException的崩溃信息，当然主要是因为找不到父类，因为父类AppCompatActivity在jar中
-            it.jarInputs.forEach {
-                val dest = outputProvider?.getContentLocation(
-                        it.name,
-                        it.contentTypes,
-                        it.scopes,
-                        Format.JAR
-                )
-                FileUtils.copyFile(it.file, dest)
+            for (directoryInput in input.directoryInputs) {
+                println("== DI = " + directoryInput.file.listFiles().toString())
+                val dest = outputProvider.getContentLocation(
+                        directoryInput.name,
+                        directoryInput.contentTypes,
+                        directoryInput.scopes,
+                        Format.DIRECTORY)
+
+                //将修改过的字节码copy到dest，就可以实现编译期间干预字节码的目的了
+                //FileUtils.copyDirectory(directoryInput.getFile(), dest)
+                transformDir(directoryInput.getFile(), dest)
             }
         }
 
+    }
+
+
+    fun transformJar(input: File, dest: File) {
+        println("=== transformJar ===")
+        FileUtils.copyFile(input, dest)
+    }
+
+
+    fun transformDir(input: File, dest: File) {
+        if (dest.exists()) {
+            FileUtils.forceDelete(dest)
+        }
+        FileUtils.forceMkdir(dest)
+        val srcDirPath = input.absolutePath
+        val destDirPath = dest.absolutePath
+        println("=== transform dir = $srcDirPath, $destDirPath")
+        for (file in input.listFiles()) {
+            val destFilePath = file.absolutePath.replace(srcDirPath, destDirPath)
+            val destFile = File(destFilePath)
+            if (file.isDirectory) {
+                transformDir(file, destFile)
+            } else if (file.isFile) {
+                FileUtils.touch(destFile)
+                transformSingleFile(file, destFile)
+            }
+        }
+    }
+
+    fun transformSingleFile(input: File, dest: File) {
+        println("=== transformSingleFile ===")
+        weave(input.absolutePath, dest.absolutePath)
+    }
+
+    fun weave(inputPath: String, outputPath: String) {
+        try {
+            val `is` = FileInputStream(inputPath)
+            val cr = ClassReader(`is`)
+            val cw = ClassWriter(ClassWriter.COMPUTE_FRAMES)
+            val adapter = TestMethodClassAdapter(cw)
+            cr.accept(adapter, 0)
+            val fos = FileOutputStream(outputPath)
+            fos.write(cw.toByteArray())
+            fos.close()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+    }
+
+    class TestMethodClassAdapter(classVisitor: ClassVisitor?) : ClassVisitor(ASM7, classVisitor), Opcodes {
+
+        override fun visitMethod(access: Int, name: String?, descriptor: String?, signature: String?, exceptions: Array<String?>?): MethodVisitor {
+            val mv: MethodVisitor = super.visitMethod(access, name, descriptor, signature, exceptions)
+            return TestMethodVisitor(mv)
+        }
+    }
+
+    class TestMethodVisitor(methodVisitor: MethodVisitor?) : MethodVisitor(ASM7, methodVisitor) {
+
+        override fun visitMethodInsn(opcode: Int, owner: String, name: String, descriptor: String?, isInterface: Boolean) {
+            println("== TestMethodVisitor, owner = $owner, name = $name")
+
+            //方法执行之前打印
+            mv.visitLdcInsn(" before method exec")
+            mv.visitLdcInsn(" [ASM 测试] method in $owner ,name=$name")
+            mv.visitMethodInsn(Opcodes.INVOKESTATIC,
+                    "android/util/Log", "i", "(Ljava/lang/String;Ljava/lang/String;)I", false)
+            mv.visitInsn(Opcodes.POP)
+
+            super.visitMethodInsn(opcode, owner, name, descriptor, isInterface)
+
+            //方法执行之后打印
+            mv.visitLdcInsn(" after method exec")
+            mv.visitLdcInsn(" method in $owner ,name=$name")
+            mv.visitMethodInsn(Opcodes.INVOKESTATIC,
+                    "android/util/Log", "i", "(Ljava/lang/String;Ljava/lang/String;)I", false)
+            mv.visitInsn(Opcodes.POP)
+        }
     }
 
 }
