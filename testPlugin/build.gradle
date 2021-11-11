@@ -1,0 +1,63 @@
+plugins {
+    id 'kotlin'
+    // 应用groovy，plugin 开发是基于groovy 语言的
+    id 'groovy'
+    // 应用maven，用于将插件上传至maven 仓库
+    id 'maven'
+}
+
+sourceSets {
+    main {
+        groovy {
+            srcDir 'src/main/groovy'
+        }
+
+        java {
+            srcDir "src/main/java"
+        }
+
+        kotlin {
+            srcDir "src/main/kotlin"
+        }
+
+        resources {
+            srcDir 'src/main/resources'
+        }
+    }
+}
+
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: '*.jar')
+    implementation gradleApi()     // groovy API
+    implementation localGroovy()   // groovy API
+
+    implementation 'com.android.tools.build:gradle:3.5.2', {
+        exclude group: 'org.ow2.asm'
+    }
+    implementation 'org.ow2.asm:asm:7.2'
+    implementation 'org.ow2.asm:asm-commons:7.2'
+    implementation 'org.ow2.asm:asm-analysis:7.2'
+    implementation 'org.ow2.asm:asm-util:7.2'
+    implementation 'org.ow2.asm:asm-tree:7.2'
+}
+
+repositories {
+//    maven { url 'https://maven.aliyun.com/repository/public' }
+//    maven { url 'https://maven.aliyun.com/repository/central' }
+//    maven { url 'https://maven.aliyun.com/repository/google' }
+//    maven { url 'https://maven.aliyun.com/repository/public' }
+//    mavenLocal()
+//    maven { url "https://maven.google.com" }
+//    mavenCentral()
+//    jcenter()
+}
+
+uploadArchives {
+    repositories.mavenDeployer {
+        repository(url: uri('../repo'))
+        pom.groupId = 'com.zkt.plugin'
+        pom.artifactId = 'zktPlugin'
+        pom.version = '1.0.2'
+    }
+}

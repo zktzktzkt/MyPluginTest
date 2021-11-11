@@ -1,0 +1,42 @@
+
+buildscript {
+
+    ext.kotlin_version = '1.3.72'
+
+    repositories {
+        //引用本地创建的插件
+        maven { url uri('/repo') }
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        maven { url 'https://maven.aliyun.com/repository/central' }
+        maven { url 'https://maven.aliyun.com/repository/google' }
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        mavenLocal()
+        maven { url "https://maven.google.com" }
+        mavenCentral()
+        jcenter()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.5.2'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "org.jetbrains.kotlin:kotlin-android-extensions:1.1.3"
+        classpath 'com.lpc.customPlugin1:buildplugin:1.0.0'
+        classpath 'com.zkt.plugin:zktPlugin:1.0.2'
+    }
+}
+
+allprojects {
+    repositories {
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        maven { url 'https://maven.aliyun.com/repository/central' }
+        maven { url 'https://maven.aliyun.com/repository/google' }
+        maven { url 'https://maven.aliyun.com/repository/public' }
+        mavenLocal()
+        maven { url "https://maven.google.com" }
+        mavenCentral()
+        jcenter()
+    }
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
