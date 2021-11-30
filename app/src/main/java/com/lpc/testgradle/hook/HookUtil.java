@@ -22,6 +22,7 @@ import java.util.List;
  */
 public class HookUtil implements IHook {
 
+    private static final String TAG = "HookUtil";
     private final Context mContext;
 
     public HookUtil(Context context) {
@@ -41,60 +42,54 @@ public class HookUtil implements IHook {
 
         try {
             final Class<?> ActivityManagerClz;
-            final String getServiceMethodStr;
-            final String IActivityManagerSingletonFieldStr;
 
             if (ifSdkOverIncluding29()) {//29的ams获取方式是通过ActivityTaskManager.getService()
                 ActivityManagerClz = Class.forName("android.app.ActivityTaskManager");
-                getServiceMethodStr = "getService";
-                IActivityManagerSingletonFieldStr = "IActivityTaskManagerSingleton";
             } else if (ifSdkOverIncluding26()) {//26，27，28的ams获取方式是通过ActivityManager.getService()
                 ActivityManagerClz = Class.forName("android.app.ActivityManager");
-                getServiceMethodStr = "getService";
-                IActivityManagerSingletonFieldStr = "IActivityManagerSingleton";
             } else {//25往下，是ActivityManagerNative.getDefault()
                 ActivityManagerClz = Class.forName("android.app.ActivityManagerNative");
-                getServiceMethodStr = "getDefault";
-                IActivityManagerSingletonFieldStr = "gDefault";
             }
 
-            //最终目的是把 IActivityTaskManagerSingleton 里面的 mInstance 替换成自己的动态代理对象
-            //1、调用ActivityTaskManager#getService()获取真实对象
-            //2、基于IActivityTaskManager接口创建动态代理对象，代理第一步
-            //3、把动态代理对象赋值给IActivityTaskManagerSingleton#mInstance
-            // 经过以上三步，AMS本地对象就被我们hook掉了
+            //创建mInstance
+            //getService已经被加入api黑名单了，获取不到
+            Method getServiceMethod = ActivityManagerClz.getDeclaredMethod("getService");
+            getServiceMethod.invoke(null);
 
-            //获取AMS的本地代理对象
-            Object ActivityManagerObj = ReflectUtil.invokeStaticMethod(ActivityManagerClz, getServiceMethodStr);
+            //获取singleton对象
+            Field IActivityTaskManagerSingletonFiled = ActivityManagerClz.getDeclaredField("IActivityTaskManagerSingleton");
+            IActivityTaskManagerSingletonFiled.setAccessible(true);
+            Object singleton = IActivityTaskManagerSingletonFiled.get(null);
 
-            Class<?> IActivityManagerClz;
-            if (ifSdkOverIncluding29()) {
-                IActivityManagerClz = Class.forName("android.app.IActivityTaskManager");
-            } else {
-                IActivityManagerClz = Class.forName("android.app.IActivityManager");
-            }
+            //获取Singleton里面的mInstance，也就是IActivityTaskManager对象
+            Class<?> singletonClass = Class.forName("android.util.Singleton");
+            Field mInstanceFiled = singletonClass.getDeclaredField("mInstance");
+            mInstanceFiled.setAccessible(true);
+            Object mInstance = mInstanceFiled.get(singleton);
 
+            Class<?> IActivityTaskManagerClass = Class.forName("android.app.IActivityTaskManager");
             // 构建代理类需要两个东西用于创建伪装的Intent
             String packageName = Util.getPMName(mContext);
             String clz = Util.getHostClzName(mContext, packageName);
             //创建本地AMS的动态代理
-            Object proxyIActivityManager =
-                    Proxy.newProxyInstance(
-                            Thread.currentThread().getContextClassLoader(),
-                            new Class[]{IActivityManagerClz},
-                            new AMSProxyInvocation(ActivityManagerObj, packageName, clz));
+            Object mInstanceProxy = Proxy.newProxyInstance(
+                    mContext.getClassLoader(),
+                    new Class[]{IActivityTaskManagerClass},
+                    new AMSProxyInvocation(mInstance, packageName, clz));
 
+            mInstanceFiled.set(singleton, mInstanceProxy);
 
             //获取ActivityTaskManager中的Singleton，其中的mInstance字段就是这个AMS代理对象
-            Object IActivityManagerSingleton = ReflectUtil.staticFieldValue(ActivityManagerClz, IActivityManagerSingletonFieldStr);
+            // Object IActivityManagerSingleton = ReflectUtil.staticFieldValue(ActivityManagerClz, IActivityManagerSingletonFieldStr);
 
             //3.拿到AMS实例，然后用代理的AMS换掉真正的AMS，代理的AMS则是用 假的Intent骗过了 activity manifest检测.
             //偷梁换柱，把singleton的mInstance替换成我们的代理对象
-            Field mInstanceField = ReflectUtil.findSingletonField("mInstance");
-            mInstanceField.set(IActivityManagerSingleton, proxyIActivityManager);
+            // Field mInstanceField = ReflectUtil.findSingletonField("mInstance");
+            // mInstanceField.set(IActivityManagerSingleton, proxyIActivityManager);
 
         } catch (Exception e) {
             e.printStackTrace();
+            Log.e(TAG, "异常", e);
         }
     }
 
@@ -105,22 +100,22 @@ public class HookUtil implements IHook {
      */
     private static class AMSProxyInvocation implements InvocationHandler {
 
-        Object amObj;
+        Object mInstance;
         String packageName;//这两个String是用来构建Intent的ComponentName的
         String clz;
 
-        public AMSProxyInvocation(Object amObj, String packageName, String clz) {
-            this.amObj = amObj;
-            this.packageName = packageName;
-            this.clz = clz;
+        public AMSProxyInvocation(Object mInstance, String packageName, String clz) {
+            this.mInstance = mInstance;
+            this.packageName = "com.lpc.testgradle";
+            this.clz = "com.lpc.testgradle.ProxyActivity";
         }
 
         @Override
         public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-            Log.e("GlobalActivityHook", "method.getName() = " + method.getName());
+            Log.e(TAG, "method.getName() = " + method.getName());
             //proxy是创建出来的代理类，method是接口中的方法，args是接口执行时的实参
             if (method.getName().equals("startActivity")) {
-                Log.d("GlobalActivityHook", "全局hook 到了 startActivity");
+                Log.d(TAG, "全局hook 到了 startActivity");
 
                 Intent currentRealIntent = null;//侦测到startActivity动作之后，把intent存到这里
                 int intentIndex = -1;
@@ -141,11 +136,11 @@ public class HookUtil implements IHook {
                 proxyIntent.putExtra(ORI_INTENT_TAG, currentRealIntent);//将真正的proxy作为参数，存放到extras中，后面会拿出来还原
 
                 args[intentIndex] = proxyIntent;//替换掉intent
-                //哟，已经成功绕过了manifest清单检测. 那么，我不能老让它跳到 伪装的Activity啊，我要给他还原回去，那么，去哪里还原呢？
-                //继续看源码。
 
+                //哟，已经成功绕过了manifest清单检测. 那么，我不能老让它跳到 伪装的Activity啊，我要给他还原回去，
+                //那么，去哪里还原呢？继续看源码
             }
-            return method.invoke(amObj, args);
+            return method.invoke(mInstance, args);
         }
     }
 

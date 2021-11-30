@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'custom_plugin1'
 apply plugin: 'zkt-plugin'
-apply plugin: 'DemoTransform'
+//apply plugin: 'DemoTransform'
 
 
 myExt {
