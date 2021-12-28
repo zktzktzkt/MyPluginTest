@@ -32,14 +32,13 @@ dependencies {
     implementation gradleApi()     // groovy API
     implementation localGroovy()   // groovy API
 
-    implementation 'com.android.tools.build:gradle:3.5.2', {
-        exclude group: 'org.ow2.asm'
-    }
-    implementation 'org.ow2.asm:asm:7.2'
-    implementation 'org.ow2.asm:asm-commons:7.2'
-    implementation 'org.ow2.asm:asm-analysis:7.2'
-    implementation 'org.ow2.asm:asm-util:7.2'
-    implementation 'org.ow2.asm:asm-tree:7.2'
+    implementation 'com.android.tools.build:gradle:3.5.2'
+
+//    implementation 'org.ow2.asm:asm:7.2'
+//    implementation 'org.ow2.asm:asm-commons:7.2'
+//    implementation 'org.ow2.asm:asm-analysis:7.2'
+//    implementation 'org.ow2.asm:asm-util:7.2'
+//    implementation 'org.ow2.asm:asm-tree:7.2'
 }
 
 repositories {

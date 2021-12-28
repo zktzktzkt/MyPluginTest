@@ -1,4 +1,4 @@
-package com.zkt.plugin2
+package com.zkt.plugin2.demo
 
 import com.android.build.api.transform.Format
 import com.android.build.api.transform.QualifiedContent
@@ -10,7 +10,6 @@ import org.apache.commons.io.FileUtils
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.objectweb.asm.*
-import org.objectweb.asm.Opcodes.ASM7
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
@@ -21,8 +20,8 @@ class DemoTransform : Transform(), Plugin<Project> {
 
     override fun apply(project: Project) {
         println(">>>>>> 1.1.1 this is a log just from DemoTransform")
-        val appExtension = project.extensions.getByType(AppExtension::class.java)
-        appExtension.registerTransform(this)
+        // val appExtension = project.extensions.getByType(AppExtension::class.java)
+        // appExtension.registerTransform(this)
     }
 
     override fun getName(): String {
@@ -125,7 +124,7 @@ class DemoTransform : Transform(), Plugin<Project> {
         }
     }
 
-    class TestMethodClassAdapter(classVisitor: ClassVisitor?) : ClassVisitor(ASM7, classVisitor), Opcodes {
+    class TestMethodClassAdapter(classVisitor: ClassVisitor?) : ClassVisitor(Opcodes.ASM5, classVisitor), Opcodes {
 
         override fun visitMethod(access: Int, name: String?, descriptor: String?, signature: String?, exceptions: Array<String?>?): MethodVisitor {
             val mv: MethodVisitor = super.visitMethod(access, name, descriptor, signature, exceptions)
@@ -133,7 +132,7 @@ class DemoTransform : Transform(), Plugin<Project> {
         }
     }
 
-    class TestMethodVisitor(methodVisitor: MethodVisitor?) : MethodVisitor(ASM7, methodVisitor) {
+    class TestMethodVisitor(methodVisitor: MethodVisitor?) : MethodVisitor(Opcodes.ASM5, methodVisitor) {
 
         override fun visitMethodInsn(opcode: Int, owner: String, name: String, descriptor: String?, isInterface: Boolean) {
             println("== TestMethodVisitor, owner = $owner, name = $name")

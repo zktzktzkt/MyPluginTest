@@ -1,4 +1,4 @@
-package com.zkt.plugin2
+package com.zkt.plugin2.demo
 
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.MethodVisitor

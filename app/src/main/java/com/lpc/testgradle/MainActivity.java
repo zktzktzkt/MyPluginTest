@@ -6,8 +6,6 @@ import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.lpc.testgradle.hook.HookUtil;
-
 public class MainActivity extends AppCompatActivity {
 
     @Override
@@ -15,7 +13,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        new HookUtil(this).hookAMS();
+        // new HookUtil(this).hookAMS();
 
         findViewById(R.id.test).setOnClickListener(new View.OnClickListener() {
            @Override
@@ -23,9 +21,17 @@ public class MainActivity extends AppCompatActivity {
                // new MyException("test exception").printStackTrace();
 
                MainActivity.this.startActivity(new Intent(MainActivity.this, TestActivity.class));
+
            }
         });
 
+        // try {
+        //     Set<String> strings = ClassUtils.getFileNameByPackageName(this.getApplication(), "com.lpc.testgradle");
+        //     Log.e("hahahahahhah", strings.toString());
+        // } catch (PackageManager.NameNotFoundException e) {
+        //     e.printStackTrace();
+        // }
     }
+
 
 }
