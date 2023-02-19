@@ -1,2 +1,2 @@
-include ':app', ':buildplugin'
-include ':testPlugin'
+include ':app'
+include ':lib-asm'

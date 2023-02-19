@@ -1,7 +1,0 @@
-java 目录改为groovy目录,
-在groovy同级创建resources->META-INF->gradle-plugins目录，添加customplugin1.properties
-删除manifest和res
-删除build.gradle的android
-添加repositories
-apply plugin: 'com.android.library'改为apply plugin: 'groovy'
-添加发布脚本，测试
