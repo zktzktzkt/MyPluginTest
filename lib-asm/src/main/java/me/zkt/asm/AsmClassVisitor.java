@@ -20,7 +20,7 @@ public class AsmClassVisitor extends ClassVisitor implements Opcodes {
     private ArrayList<String> names;
 
     public AsmClassVisitor(ClassVisitor cv) {
-        super(Opcodes.ASM5, cv);
+        super(Opcodes.ASM6, cv);
         List<String> list = Arrays.asList(methodNames);
         names = new ArrayList<>(list);
     }

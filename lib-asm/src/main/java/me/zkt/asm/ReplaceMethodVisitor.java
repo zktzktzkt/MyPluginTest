@@ -87,7 +87,7 @@ public class ReplaceMethodVisitor extends AdviceAdapter {
      */
     @Override
     public void visitMethodInsn(int opcode, String owner, String name, String desc, boolean itf) {
-        System.out.println("  调用方法visitMethodInsn opcode->" + opcode + " owner->" + owner + " name->" + name + " desc->" + desc);
+//        System.out.println("  调用方法visitMethodInsn opcode->" + opcode + " owner->" + owner + " name->" + name + " desc->" + desc);
 
         //替换Thread构造函数为ShadowThread
         if (owner.equals("java/lang/Thread") && name.equals("<init>") && INVOKESPECIAL == opcode) {
