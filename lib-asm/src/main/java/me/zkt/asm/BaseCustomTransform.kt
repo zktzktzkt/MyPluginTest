@@ -263,7 +263,8 @@ abstract class BaseCustomTransform(private val enableLog: Boolean) : Transform()
                 && !name.startsWith("kotlinx/")
                 && !name.startsWith("org/intellij/")
                 && !name.startsWith("org/jetbrains/")
-                && !name.startsWith("com/google/"))
+                && !name.startsWith("com/google/")
+                && !name.startsWith("io/flutter/"))
     }
 
     fun initDir(project: Project) {
