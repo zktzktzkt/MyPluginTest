@@ -70,25 +70,4 @@ class MyCustomPlugin : BaseCustomTransform(true), Plugin<Project> {
 //        saveModifiedClassForCheck(inputFile);
     }
 
-    /**
-     * 检查class文件是否需要处理
-     * @param fileName
-     * @return
-     */
-    fun checkClassFile(name : String) : Boolean{
-        return (name.endsWith(".class")
-                && "R.class" != name
-                && "BuildConfig.class" != name
-                && !name.contains("R.class")
-                && !name.contains("R\$")
-                && !name.startsWith("META-INF/")
-                && !name.startsWith("android/")
-                && !name.startsWith("androidx/")
-                && !name.startsWith("kotlin/")
-                && !name.startsWith("kotlinx/")
-                && !name.startsWith("org/intellij/")
-                && !name.startsWith("org/jetbrains/")
-                && !name.startsWith("com/google/"))
-    }
-
 }

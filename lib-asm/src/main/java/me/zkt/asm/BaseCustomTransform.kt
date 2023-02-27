@@ -1,6 +1,5 @@
 package me.zkt.asm
 
-import com.android.SdkConstants
 import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
 import com.android.builder.utils.isValidZipEntryName
@@ -35,7 +34,7 @@ abstract class BaseCustomTransform(private val enableLog: Boolean) : Transform()
     /**
      * 上层可重写该方法进行文件过滤
      */
-    open fun classFilter(className: String) = className.endsWith(SdkConstants.DOT_CLASS)
+    open fun classFilter(className: String) = checkClassFile(className)
 
 
     /**
@@ -164,27 +163,33 @@ abstract class BaseCustomTransform(private val enableLog: Boolean) : Transform()
      * Do transform Jar.
      */
     private fun doTransformJar(inputJar: File, outputJar: File, function: ((InputStream, OutputStream) -> Unit)?) {
-        // Create parent directories to hold outputJar file.
+        // 创建父级目录来容纳 outputJar 文件。
         Files.createParentDirs(outputJar)
-        // Unzip.
+        // 打开输入 jar 文件作为输入流
         FileInputStream(inputJar).use { fis ->
+            // 使用 zip 流包装输入流以读取 jar 条目
             ZipInputStream(fis).use { zis ->
-                // Zip.
+                // 打开输出 jar 文件作为输出流
                 FileOutputStream(outputJar).use { fos ->
+                    // 使用 zip 流包装输出流以写入 jar 条目
                     ZipOutputStream(fos).use { zos ->
+                        // 迭代输入流中的每个 jar 条目
                         var entry = zis.nextEntry
                         while (entry != null && isValidZipEntryName(entry)) {
+                            // 仅处理非目录条目
                             if (!entry.isDirectory) {
+                                // 在输出流中创建与输入条目相同名称的新的 zip 条目
                                 zos.putNextEntry(ZipEntry(entry.name))
                                 if (classFilter(entry.name)) {
-                                    // Apply transform function.
+                                    // 如果匹配，则将给定的转换函数应用于输入流和输出流
                                     applyFunction(zis, zos, function)
                                     log("修改jar->" + outputJar.name + "  class->"+ entry.name)
                                 } else {
-                                    // Copy.
+                                    // 如果条目的名称不匹配类过滤器，则只需将其复制到输出流中
                                     zis.copyTo(zos)
                                 }
                             }
+                            // 移动到输入流中的下一个条目
                             entry = zis.nextEntry
                         }
                     }
@@ -238,6 +243,27 @@ abstract class BaseCustomTransform(private val enableLog: Boolean) : Transform()
         if (enableLog) {
             println(" $name - $logStr")
         }
+    }
+
+    /**
+     * 检查class文件是否需要处理
+     * @param fileName
+     * @return
+     */
+    fun checkClassFile(name : String) : Boolean{
+        return (name.endsWith(".class")
+                && "R.class" != name
+                && "BuildConfig.class" != name
+                && !name.contains("R.class")
+                && !name.contains("R\$")
+                && !name.startsWith("META-INF/")
+                && !name.startsWith("android/")
+                && !name.startsWith("androidx/")
+                && !name.startsWith("kotlin/")
+                && !name.startsWith("kotlinx/")
+                && !name.startsWith("org/intellij/")
+                && !name.startsWith("org/jetbrains/")
+                && !name.startsWith("com/google/"))
     }
 
     fun initDir(project: Project) {
