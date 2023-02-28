@@ -3,6 +3,7 @@
     package="com.lpc.testgradle">
 
     <application
+        android:name="com.asm.demo.MyApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -17,6 +18,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name="com.asm.demo.MyFlutterActivity"/>
+        <activity android:name="io.flutter.embedding.android.FlutterActivity"/>
+
     </application>
 
 </manifest>
