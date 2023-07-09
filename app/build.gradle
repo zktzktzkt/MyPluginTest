@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-apply plugin: 'MyCustomPlugin'
+//apply plugin: 'MyCustomPlugin'
 
 android {
     compileSdkVersion 32
@@ -32,10 +32,10 @@ android {
 
 }
 
-myExtension {
-    //声明哪些三方库的类需要插桩
-    thirdPackage = ["com/jaeger/library"]
-}
+//myExtension {
+//    //声明哪些三方库的类需要插桩
+//    thirdPackage = ["com/jaeger/library"]
+//}
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -45,5 +45,58 @@ dependencies {
     implementation 'org.greenrobot:eventbus:3.1.1'
 
     implementation project(':flutter')
+    implementation project(':flutter_boost')
 }
+
+//第一步：增加实体类配置
+class AndroidExt{
+
+    int compileSdkVersionExt
+    DefaultConfigExt defaultConfigExt = new DefaultConfigExt()
+
+    /**
+     * 通过 Action 创建内部 Extension，名称为方法名 defaultConfig
+     * @param action 可执行的动作，实质上是一个代码块
+     */
+    void defaultConfigExt(Action<DefaultConfigExt> action) {
+        action.execute(defaultConfigExt)
+    }
+}
+
+class DefaultConfigExt{
+    String applicationIdExt
+    int minSdkVersionExt
+    int targetSdkVersionExt
+    int versionCodeExt
+    String versionNameExt
+}
+
+//第二步：创建 Extension
+project.extensions.create('androidExt',AndroidExt)
+
+//第三步：进行语句块配置
+androidExt {
+    compileSdkVersionExt 30
+    defaultConfigExt {
+        applicationIdExt = 'com.dream.gradledemo'
+        minSdkVersionExt = 19
+        targetSdkVersionExt = 30
+        versionCodeExt = 1
+        versionNameExt = '1.0'
+    }
+}
+
+//第四步：编写 Task 进行测试
+project.task('testTask'){
+    doLast {
+        println project.androidExt.compileSdkVersionExt
+        println project.androidExt.defaultConfigExt.applicationIdExt
+        println project.androidExt.defaultConfigExt.minSdkVersionExt
+        println project.androidExt.defaultConfigExt.targetSdkVersionExt
+        println project.androidExt.defaultConfigExt.versionCodeExt
+        println project.androidExt.defaultConfigExt.versionNameExt
+    }
+}
+
+
 

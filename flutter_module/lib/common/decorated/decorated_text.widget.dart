@@ -1,0 +1,133 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_module/common/alias.dart';
+
+///装饰Text文本widget
+class DecoratedText extends StatelessWidget {
+  const DecoratedText(
+    this.data, {
+    Key? key,
+    this.padding,
+    this.margin,
+    this.decoration,
+    this.style,
+    this.strutStyle = const StrutStyle(),
+    this.onPressed,
+    this.maxLines,
+    this.textAlign,
+    this.overflow,
+    this.constraints,
+    this.expanded = false,
+    this.flex = 1,
+    this.visible,
+    this.width,
+    this.height,
+    this.center,
+    this.transform,
+    this.sliver,
+    this.leftWidget,
+    this.rightWidget,
+    this.softWrap = true,
+    this.material,
+    this.mainAxisAlignment,
+    this.crossAxisAlignment,
+  }) : super(key: key);
+
+  final EdgeInsetsGeometry? padding;
+  final EdgeInsetsGeometry? margin;
+  final BoxDecoration? decoration;
+  final TextStyle? style;
+  final StrutStyle strutStyle;
+  final String data;
+  final ContextCallback? onPressed;
+  final int? maxLines;
+  final TextAlign? textAlign;
+  final TextOverflow? overflow;
+  final BoxConstraints? constraints;
+  final bool expanded;
+  final int flex;
+  final double? width;
+  final double? height;
+  final bool? visible;
+  final bool? center;
+  final bool? sliver;
+  final Matrix4? transform;
+  final Widget? leftWidget;
+  final Widget? rightWidget;
+  final bool softWrap;
+  final bool? material;
+  final MainAxisAlignment? mainAxisAlignment;
+  final CrossAxisAlignment? crossAxisAlignment;
+
+  @override
+  Widget build(BuildContext context) {
+    Widget result = Text(
+      data,
+      maxLines: maxLines,
+      style: style ?? DefaultTextStyle.of(context).style,
+      strutStyle: strutStyle,
+      textAlign: textAlign,
+      overflow: overflow,
+      softWrap: softWrap,
+    );
+
+    if (rightWidget != null || leftWidget != null) {
+      result = Row(
+        mainAxisAlignment: mainAxisAlignment ?? MainAxisAlignment.center,
+        crossAxisAlignment: crossAxisAlignment ?? CrossAxisAlignment.center,
+        children: [
+          if (leftWidget != null) leftWidget!,
+          result,
+          if (rightWidget != null) rightWidget!,
+        ],
+      );
+    }
+
+    if (center == true) {
+      result = Center(child: result);
+    }
+
+    if (width != null ||
+        height != null ||
+        decoration != null ||
+        margin != null ||
+        padding != null ||
+        constraints != null ||
+        transform != null) {
+      result = Container(
+        width: width,
+        height: height,
+        margin: margin,
+        padding: padding,
+        decoration: decoration,
+        constraints: constraints,
+        transform: transform,
+        child: result,
+      );
+    }
+
+    if (onPressed != null) {
+      result = GestureDetector(
+        onTap: () => onPressed!(context),
+        child: result,
+      );
+    }
+
+    if (visible != null) {
+      result = Visibility(visible: visible!, child: result);
+    }
+
+    if (material == true) {
+      result = Material(color: Colors.transparent, child: result);
+    }
+
+    if (expanded == true) {
+      result = Expanded(child: result, flex: flex,);
+    }
+
+    if (sliver == true) {
+      result = SliverToBoxAdapter(child: result);
+    }
+
+    return result;
+  }
+}
