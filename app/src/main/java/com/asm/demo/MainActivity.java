@@ -1,21 +1,14 @@
 package com.asm.demo;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.asm.demo.flutter.FlutterJumpManager;
 import com.jaeger.library.StatusBarUtil;
 import com.lpc.testgradle.R;
-
-import io.flutter.embedding.android.FlutterActivity;
-import io.flutter.embedding.engine.FlutterEngine;
-import io.flutter.embedding.engine.FlutterEngineCache;
-import io.flutter.embedding.engine.dart.DartExecutor;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -37,7 +30,6 @@ public class MainActivity extends AppCompatActivity {
      * @param view
      */
     public void onCLickLoadFlutter(View view) {
-        FlutterJumpManager.jumpMain(this);
     }
 
     @Override

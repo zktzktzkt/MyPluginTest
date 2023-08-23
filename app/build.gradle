@@ -44,8 +44,8 @@ dependencies {
     implementation 'com.jaeger.statusbarutil:library:1.5.1'
     implementation 'org.greenrobot:eventbus:3.1.1'
 
-    implementation project(':flutter')
-    implementation project(':flutter_boost')
+//    implementation project(':flutter')
+//    implementation project(':flutter_boost')
 }
 
 //第一步：增加实体类配置
