@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-//apply plugin: 'MyCustomPlugin'
+apply plugin: 'MyCustomPlugin-local'
 
 android {
     compileSdkVersion 32
@@ -32,10 +32,10 @@ android {
 
 }
 
-//myExtension {
-//    //声明哪些三方库的类需要插桩
-//    thirdPackage = ["com/jaeger/library"]
-//}
+myExtension {
+    //声明哪些三方库的类需要插桩
+    thirdPackage = ["com/jaeger/library"]
+}
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
