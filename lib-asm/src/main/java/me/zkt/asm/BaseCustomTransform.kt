@@ -6,6 +6,7 @@ import com.android.builder.utils.isValidZipEntryName
 import com.android.utils.FileUtils
 import com.google.common.io.Files
 import org.gradle.api.Project
+import org.gradle.internal.impldep.bsh.commands.dir
 import java.io.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
@@ -51,12 +52,27 @@ abstract class BaseCustomTransform(private val enableLog: Boolean) : Transform()
         return TransformManager.SCOPE_FULL_PROJECT
     }
 
-
     /**
      * 默认开启增量编译
      */
     override fun isIncremental(): Boolean {
         return true
+    }
+
+    /**
+     * 初始化插桩文件的临时目录，子类调用（方便查看是否插桩正确）
+     */
+    fun initDir(project: Project) {
+        this.project = project
+        if (!project.buildDir.exists()) {
+            project.buildDir.mkdirs()
+        }
+        tempFile = File(project.buildDir, "asm")
+        tempFile?.let {
+            if (!it.exists()) {
+                it.mkdir()
+            }
+        }
     }
 
     /**
@@ -165,33 +181,33 @@ abstract class BaseCustomTransform(private val enableLog: Boolean) : Transform()
     private fun doTransformJar(inputJar: File, outputJar: File, function: ((InputStream, OutputStream) -> Unit)?) {
         // 创建父级目录来容纳 outputJar 文件。
         Files.createParentDirs(outputJar)
-        // 打开输入 jar 文件作为输入流
+
+        //inputJar输入流
         FileInputStream(inputJar).use { fis ->
-            // 使用 zip 流包装输入流以读取 jar 条目
             ZipInputStream(fis).use { zis ->
-                // 打开输出 jar 文件作为输出流
+                //outputJar输出流
                 FileOutputStream(outputJar).use { fos ->
-                    // 使用 zip 流包装输出流以写入 jar 条目
                     ZipOutputStream(fos).use { zos ->
-                        // 迭代输入流中的每个 jar 条目
-                        var entry = zis.nextEntry
-                        while (entry != null && isValidZipEntryName(entry)) {
-                            // 仅处理非目录条目
-                            if (!entry.isDirectory) {
-                                // 在输出流中创建与输入条目相同名称的新的 zip 条目
-                                zos.putNextEntry(ZipEntry(entry.name))
-                                if (classFilter(entry.name)) {
-                                    // 如果匹配，则将给定的转换函数应用于输入流和输出流
+                        //获取第一个文件
+                        var inputEntry = zis.nextEntry
+                        while (inputEntry != null && isValidZipEntryName(inputEntry)) {
+                            //只处理非目录
+                            if (!inputEntry.isDirectory) {
+                                //调用了putNextEntry并传入一个ZipEntry对象，接下来对ZipOutputStream的write操作都会写入到这个新创建的条目（Entry）中
+                                zos.putNextEntry(ZipEntry(inputEntry.name))
+                                //如果符合修改条件，通过asm修改后写到outputStream中
+                                if (classFilter(inputEntry.name)) {
                                     applyFunction(zis, zos, function)
-                                    log("修改jar->" + outputJar.name + "  class->"+ entry.name)
+                                    //log("修改jar->" + outputJar.name + "  class->"+ inputEntry.name)
                                 } else {
-                                    // 如果条目的名称不匹配类过滤器，则只需将其复制到输出流中
+                                    //不符合修改条件就直接复制到outputStream中
                                     zis.copyTo(zos)
                                 }
                             }
-                            // 移动到输入流中的下一个条目
-                            entry = zis.nextEntry
+                            //读取下一个文件
+                            inputEntry = zis.nextEntry
                         }
+
                     }
                 }
             }
@@ -208,11 +224,11 @@ abstract class BaseCustomTransform(private val enableLog: Boolean) : Transform()
             FileOutputStream(outputFile).use { fos ->
                 // Apply transform function.
                 applyFunction(fis, fos, function)
-                log("修改file->" + outputFile.path)
+                //log("修改file->" + outputFile.path)
+                saveModifiedClassForCheck(outputFile)
             }
         }
     }
-
 
     private fun applyFunction(
         input: InputStream,
@@ -267,21 +283,8 @@ abstract class BaseCustomTransform(private val enableLog: Boolean) : Transform()
                 && !name.startsWith("io/flutter/"))
     }
 
-    fun initDir(project: Project) {
-        this.project = project
-        if (!project.buildDir.exists()) {
-            project.buildDir.mkdirs()
-        }
-        tempFile = File(project.buildDir, "asm")
-        tempFile?.let {
-            if (!it.exists()) {
-                it.mkdir()
-            }
-        }
-    }
-
     /**
-     * 保存插桩后的文件到临时目录 方便查看是否插桩正确
+     * 保存插桩后的文件到临时目录（方便查看是否插桩正确）
      */
     fun saveModifiedClassForCheck(tempClass: File) {
         tempFile?.let {

@@ -207,10 +207,9 @@ class AsmPlugin extends Transform implements Plugin<Project> {
         }
     }
 
-    /*
-    保存插桩后的文件到临时目录 方便查看是否插桩正确
+    /**
+     * 保存插桩后的文件到临时目录 方便查看是否插桩正确
      */
-
     static void saveModifiedClassForCheck(File tempClass) {
         File dir = tempFile
         File checkJarFile = new File(dir, tempClass.getName().replace("/", "_"))

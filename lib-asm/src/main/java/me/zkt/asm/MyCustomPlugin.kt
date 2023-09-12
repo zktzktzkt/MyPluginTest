@@ -15,7 +15,7 @@ class MyCustomPlugin : BaseCustomTransform(true), Plugin<Project> {
 
     override fun apply(project: Project) {
         println("Hello CustomTransformPlugin")
-//        initDir(project)
+        initDir(project)
         //新增的代码
         // 1、获取 Android 扩展
         val androidExtension = project.extensions.getByType(AppExtension::class.java)

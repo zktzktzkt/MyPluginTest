@@ -35,3 +35,67 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+/**
+ * 删除指定目录下的文件
+ */
+task deleteJavaSource(type: Delete) {
+    doFirst {
+        println("path===>${project.rootDir}")
+        println("===delete Plugin Source start===")
+    }
+    followSymlinks = true
+    delete "${project.rootDir}/lib-asm/src/main/java"
+    doLast {
+        println("===delete Plugin Source end===")
+    }
+}
+
+/**
+ * 同步buildSrc中的代码
+ */
+task copyPluginJavaSource(type: Copy, dependsOn: deleteJavaSource) {
+    doFirst {
+        println("===copy Plugin Source start===")
+    }
+
+    from "${project.rootDir}/buildSrc/src/main/java"
+    into "${project.rootDir}/lib-asm/src/main/java"
+    include('**/*')
+
+    doLast {
+        println("===copy Plugin Source end===")
+    }
+}
+
+/**
+ * 删除指定目录下的文件
+ */
+task deleteGroovySource(type: Delete) {
+    doFirst {
+        println("path===>${project.rootDir}")
+        println("===delete Plugin Source start===")
+    }
+    followSymlinks = true
+    delete "${project.rootDir}/lib-asm/src/main/groovy"
+    doLast {
+        println("===delete Plugin Source end===")
+    }
+}
+
+/**
+ * 同步buildSrc中的代码
+ */
+task copyPluginGroovySource(type: Copy, dependsOn: deleteGroovySource) {
+    doFirst {
+        println("===copy Plugin Source start===")
+    }
+
+    from "${project.rootDir}/buildSrc/src/main/groovy"
+    into "${project.rootDir}/lib-asm/src/main/groovy"
+    include('**/*')
+
+    doLast {
+        println("===copy Plugin Source end===")
+    }
+}

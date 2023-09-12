@@ -38,7 +38,7 @@ class AutoTrackTransform extends BaseTransform {
         ClassWriter classWriter = new ClassWriter(ClassWriter.COMPUTE_MAXS)
         ClassVisitor classVisitor = new AsmClassVisitor(classWriter)
         ClassReader cr = new ClassReader(srcClass)
-        cr.accept(classVisitor, ClassReader.SKIP_FRAMES)
+        cr.accept(classVisitor, ClassReader.EXPAND_FRAMES)
         return classWriter.toByteArray()
     }
 
