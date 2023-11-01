@@ -1,6 +1,7 @@
 package me.zkt.asm;
 
 import org.objectweb.asm.ClassVisitor;
+import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.MethodVisitor;
 import org.objectweb.asm.Opcodes;
 
@@ -32,6 +33,12 @@ public class AsmClassVisitor extends ClassVisitor implements Opcodes {
     public void visit(int version, int access, String name, String signature, String superName, String[] interfaces) {
         this.mClassName = name;
         super.visit(version, access, name, signature, superName, interfaces);
+    }
+
+
+    @Override
+    public FieldVisitor visitField(int access, String name, String descriptor, String signature, Object value) {
+        return super.visitField(access, name, descriptor, signature, value);
     }
 
     /**
