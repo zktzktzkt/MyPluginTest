@@ -32,20 +32,20 @@ public class MainActivity extends AppCompatActivity {
         list.add(bean1);
 
         GoodsTagBean bean2 = new GoodsTagBean();
-        bean2.setYAxis(300);
-        bean2.setXAxis(300);
+        bean2.setYAxis(500);
+        bean2.setXAxis(500);
         bean2.setDirection("t");
         list.add(bean2);
 //
         GoodsTagBean bean3 = new GoodsTagBean();
-        bean3.setYAxis(300);
-        bean3.setXAxis(300);
+        bean3.setYAxis(700);
+        bean3.setXAxis(700);
         bean3.setDirection("r");
         list.add(bean3);
 //
         GoodsTagBean bean4 = new GoodsTagBean();
-        bean4.setYAxis(300);
-        bean4.setXAxis(300);
+        bean4.setYAxis(900);
+        bean4.setXAxis(900);
         bean4.setDirection("b");
         list.add(bean4);
 

@@ -21,12 +21,22 @@ class GoodsTagLayout @JvmOverloads constructor(
         }
     }
 
+    /** 显示了信息的view */
+    val infoShowingViews = mutableListOf<GoodsTagView>()
+
     override fun onLayout(changed: Boolean, left: Int, top: Int, right: Int, bottom: Int) {
         for (i in 0 until childCount) {
             if (getChildAt(i) is GoodsTagView) {
-                val view = getChildAt(i)
+                val view = getChildAt(i) as GoodsTagView
                 view.measure(0, 0)
-                (view as GoodsTagView).data?.let {
+
+                //锚点点击
+                view.setAnchorClickListener { direction ->
+
+                }
+
+                //根据方向布局信息
+                view.data?.let {
                     when (it.direction) {
                         "l" -> {
                             val l = it.yAxis - view.measuredWidth + view.anchorWidth
