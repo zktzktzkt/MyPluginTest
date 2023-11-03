@@ -7,17 +7,29 @@
         android:id="@+id/tv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        android:text="Hello World!"
+        android:visibility="gone" />
 
-    <Button
-        android:onClick="onCLickLoadFlutter"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="加载Flutter" />
-
-    <FrameLayout
-        android:id="@+id/fl_container"
+    <com.asm.demo.SquareFrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+
+        <ImageView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitXY"
+            android:src="@drawable/ic_launcher_background" />
+
+        <com.asm.demo.GoodsTagLayout
+            android:id="@+id/layoutGoodsTag"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+
+        <View
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:background="#00ff00"
+            android:translationX="300px"
+            android:translationY="300px" />
+    </com.asm.demo.SquareFrameLayout>
 </FrameLayout>

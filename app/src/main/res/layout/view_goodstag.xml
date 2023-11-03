@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/ll_root"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <View
+            android:id="@+id/v_anchorLeft"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:background="#333333"
+            app:layout_constraintBottom_toBottomOf="@id/line_left"
+            app:layout_constraintRight_toLeftOf="@id/line_left"
+            app:layout_constraintTop_toTopOf="@id/line_left" />
+
+        <View
+            android:id="@+id/line_left"
+            android:layout_width="15dp"
+            android:layout_height="1dp"
+            android:background="#333333"
+            app:layout_constraintBottom_toBottomOf="@id/ll_info"
+            app:layout_constraintLeft_toRightOf="@id/v_anchorLeft"
+            app:layout_constraintTop_toTopOf="@id/ll_info" />
+
+        <LinearLayout
+            android:id="@+id/ll_info"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="#eeeeee"
+            android:orientation="vertical"
+            android:padding="3dp"
+            app:layout_constraintLeft_toRightOf="@id/line_left"
+            app:layout_constraintTop_toBottomOf="@id/line_top">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="科技皮沙发"
+                android:textColor="#333333"
+                android:textSize="9dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="¥12345"
+                android:textColor="#333333"
+                android:textSize="9dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="满200减200"
+                android:textColor="#333333"
+                android:textSize="9dp" />
+        </LinearLayout>
+
+        <View
+            android:id="@+id/line_right"
+            android:layout_width="15dp"
+            android:layout_height="1dp"
+            android:background="#333333"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="@id/ll_info"
+            app:layout_constraintLeft_toRightOf="@id/ll_info"
+            app:layout_constraintTop_toTopOf="@id/ll_info"
+            tools:visibility="visible" />
+
+        <View
+            android:id="@+id/v_anchorRight"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:background="#333333"
+            app:layout_constraintBottom_toBottomOf="@id/line_right"
+            app:layout_constraintLeft_toRightOf="@id/line_right"
+            app:layout_constraintTop_toTopOf="@id/line_right" />
+
+        <View
+            android:id="@+id/line_top"
+            android:layout_width="1dp"
+            android:layout_height="15dp"
+            android:background="#333333"
+            android:visibility="gone"
+            app:layout_constraintLeft_toLeftOf="@id/ll_info"
+            app:layout_constraintRight_toRightOf="@id/ll_info"
+            app:layout_constraintTop_toBottomOf="@id/v_anchorTop"
+            tools:visibility="visible" />
+
+        <View
+            android:id="@+id/v_anchorTop"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:background="#333333"
+            app:layout_constraintBottom_toTopOf="@id/line_top"
+            app:layout_constraintLeft_toLeftOf="@id/line_top"
+            app:layout_constraintRight_toRightOf="@id/line_top" />
+
+        <View
+            android:id="@+id/line_bottom"
+            android:layout_width="1dp"
+            android:layout_height="15dp"
+            android:background="#333333"
+            android:visibility="gone"
+            app:layout_constraintLeft_toLeftOf="@id/ll_info"
+            app:layout_constraintRight_toRightOf="@id/ll_info"
+            app:layout_constraintTop_toBottomOf="@id/ll_info"
+            tools:visibility="visible" />
+
+        <View
+            android:id="@+id/v_anchorBottom"
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:background="#333333"
+            app:layout_constraintLeft_toLeftOf="@id/line_bottom"
+            app:layout_constraintRight_toRightOf="@id/line_bottom"
+            app:layout_constraintTop_toBottomOf="@id/line_bottom" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</LinearLayout>

@@ -10,6 +10,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.jaeger.library.StatusBarUtil;
 import com.lpc.testgradle.R;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -18,19 +21,38 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        //搞一个耗时操作
-        String test = "";
-        for (int i = 0; i < 10000; i++) {
-            test += i;
-        }
+        GoodsTagLayout layoutGoodsTag = findViewById(R.id.layoutGoodsTag);
+
+        List<GoodsTagBean> list = new ArrayList<>();
+
+        GoodsTagBean bean1 = new GoodsTagBean();
+        bean1.setYAxis(300);
+        bean1.setXAxis(300);
+        bean1.setDirection("l");
+        list.add(bean1);
+
+        GoodsTagBean bean2 = new GoodsTagBean();
+        bean2.setYAxis(300);
+        bean2.setXAxis(300);
+        bean2.setDirection("t");
+        list.add(bean2);
+//
+        GoodsTagBean bean3 = new GoodsTagBean();
+        bean3.setYAxis(300);
+        bean3.setXAxis(300);
+        bean3.setDirection("r");
+        list.add(bean3);
+//
+        GoodsTagBean bean4 = new GoodsTagBean();
+        bean4.setYAxis(300);
+        bean4.setXAxis(300);
+        bean4.setDirection("b");
+        list.add(bean4);
+
+        layoutGoodsTag.setGoodsTags(list);
+
     }
 
-    /**
-     * 点击跳转flutter页面
-     * @param view
-     */
-    public void onCLickLoadFlutter(View view) {
-    }
 
     @Override
     protected void onStart() {
@@ -42,7 +64,6 @@ public class MainActivity extends AppCompatActivity {
                 StatusBarUtil.setLightMode(MainActivity.this);
             }
         });
-
     }
 
     @Override
@@ -61,18 +82,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         super.onStop();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        /**
-         * 注意这里一定要销毁，否则会导致内存泄漏
-         * 因为 FlutterEngine 比显示它的 FlutterActivity 生命周期要长
-         * 当我们退出 FlutterActivity 时，FlutterEngine 可能还会继续执行代码
-         * 所以我们应该在 FlutterActivity 退出时调用 flutterEngine.destroy 停止执行并释放资源
-         */
-//        flutterEngine.destroy();
     }
 
     public void onHhHAHAH(Context context, String name, String age) {
