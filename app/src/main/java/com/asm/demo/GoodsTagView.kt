@@ -11,7 +11,7 @@ class GoodsTagView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
 ) : FrameLayout(context, attrs) {
 
-    private var anchorClicklistener: ((String?) -> Unit)? = null
+    private var anchorClicklistener: ((GoodsTagView, String?, GoodsTagBean?) -> Unit)? = null
     private var llInfo: LinearLayout
 
     private var anchorLeft: View
@@ -63,11 +63,27 @@ class GoodsTagView @JvmOverloads constructor(
     }
 
     /**
+     * 数据
+     */
+    var data: GoodsTagBean? = null
+        get() = field
+        set(value) {
+            field = value
+            value?.let {
+                if (it.isShow) {
+                    showInfoView()
+                } else {
+                    hideInfoView()
+                }
+            }
+        }
+
+    /**
      * 锚点点击
      */
     private fun anchorClick() {
         reverseShowInfoView()
-        anchorClicklistener?.invoke(data?.direction)
+        anchorClicklistener?.invoke(this, data?.direction, data)
     }
 
     /**
@@ -89,20 +105,27 @@ class GoodsTagView @JvmOverloads constructor(
             return
         }
         var lineView: View? = null
+        var anchorView: View? = null
         when (data!!.direction) {
-            "l" -> {
+            DIRECTION.LEFT.value -> {
                 lineView = lineRight
+                anchorView = anchorRight
             }
-            "t" -> {
+            DIRECTION.TOP.value -> {
                 lineView = lineBottom
+                anchorView = anchorBottom
             }
-            "r" -> {
+            DIRECTION.RIGHT.value -> {
                 lineView = lineLeft
+                anchorView = anchorLeft
             }
-            "b" -> {
+            DIRECTION.BOTTOM.value -> {
                 lineView = lineTop
+                anchorView = anchorTop
             }
         }
+        data?.isShow = true
+        anchorView?.visibility = VISIBLE
         lineView?.visibility = VISIBLE
         llInfo.visibility = VISIBLE
         isShowingInfo = true
@@ -116,20 +139,27 @@ class GoodsTagView @JvmOverloads constructor(
             return
         }
         var lineView: View? = null
+        var anchorView: View? = null
         when (data!!.direction) {
-            "l" -> {
+            DIRECTION.LEFT.value -> {
                 lineView = lineRight
+                anchorView = anchorRight
             }
-            "t" -> {
+            DIRECTION.TOP.value -> {
                 lineView = lineBottom
+                anchorView = anchorBottom
             }
-            "r" -> {
+            DIRECTION.RIGHT.value -> {
                 lineView = lineLeft
+                anchorView = anchorLeft
             }
-            "b" -> {
+            DIRECTION.BOTTOM.value -> {
                 lineView = lineTop
+                anchorView = anchorTop
             }
         }
+        data?.isShow = false
+        anchorView?.visibility = VISIBLE
         lineView?.visibility = GONE
         llInfo.visibility = GONE
         isShowingInfo = false
@@ -138,52 +168,13 @@ class GoodsTagView @JvmOverloads constructor(
     /**
      * 设置锚点点击
      */
-    fun setAnchorClickListener(listener: ((String?) -> Unit)?) {
+    fun setAnchorClickListener(listener: ((GoodsTagView, String?, GoodsTagBean?) -> Unit)?) {
         anchorClicklistener = listener
     }
 
     fun dp2px(context: Context, dp: Float): Int {
         val scale = context.resources.displayMetrics.density
         return (dp * scale + 0.5f).toInt()
-    }
-
-    var data: GoodsTagBean? = null
-        get() = field
-        set(value) {
-            field = value
-            value?.let {
-                when (it.direction) {
-                    "l" -> {
-                        setLineVisibility(left = false, top = false, right = true, bottom = false)
-                    }
-                    "t" -> {
-                        setLineVisibility(left = false, top = false, right = false, bottom = true)
-                    }
-                    "r" -> {
-                        setLineVisibility(left = true, top = false, right = false, bottom = false)
-                    }
-                    "b" -> {
-                        setLineVisibility(left = false, top = true, right = false, bottom = false)
-                    }
-                }
-            }
-        }
-
-    /**
-     * 设置线的可见
-     */
-    private fun setLineVisibility(left: Boolean, top: Boolean, right: Boolean, bottom: Boolean) {
-        lineLeft.visibility = if (left) VISIBLE else GONE
-        anchorLeft.visibility = if (left) VISIBLE else GONE
-
-        lineTop.visibility = if (top) VISIBLE else GONE
-        anchorTop.visibility = if (top) VISIBLE else GONE
-
-        lineRight.visibility = if (right) VISIBLE else GONE
-        anchorRight.visibility = if (right) VISIBLE else GONE
-
-        lineBottom.visibility = if (bottom) VISIBLE else GONE
-        anchorBottom.visibility = if (bottom) VISIBLE else GONE
     }
 
 }

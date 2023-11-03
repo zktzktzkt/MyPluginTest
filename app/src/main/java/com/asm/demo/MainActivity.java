@@ -26,30 +26,45 @@ public class MainActivity extends AppCompatActivity {
         List<GoodsTagBean> list = new ArrayList<>();
 
         GoodsTagBean bean1 = new GoodsTagBean();
-        bean1.setYAxis(300);
         bean1.setXAxis(300);
+        bean1.setYAxis(300);
         bean1.setDirection("l");
         list.add(bean1);
 
         GoodsTagBean bean2 = new GoodsTagBean();
-        bean2.setYAxis(500);
         bean2.setXAxis(500);
+        bean2.setYAxis(500);
         bean2.setDirection("t");
         list.add(bean2);
 //
         GoodsTagBean bean3 = new GoodsTagBean();
-        bean3.setYAxis(700);
         bean3.setXAxis(700);
+        bean3.setYAxis(700);
         bean3.setDirection("r");
         list.add(bean3);
 //
         GoodsTagBean bean4 = new GoodsTagBean();
-        bean4.setYAxis(900);
         bean4.setXAxis(900);
-        bean4.setDirection("b");
+        bean4.setYAxis(900);
+        bean4.setDirection("l");
         list.add(bean4);
 
-        layoutGoodsTag.setGoodsTags(list);
+        GoodsTagBean bean5 = new GoodsTagBean();
+        bean5.setXAxis(800);
+        bean5.setYAxis(300);
+        bean5.setDirection("t");
+        list.add(bean5);
+
+        GoodsTagBean bean6 = new GoodsTagBean();
+        bean6.setXAxis(300);
+        bean6.setYAxis(800);
+        bean6.setDirection("l");
+        list.add(bean6);
+
+        GoodsTagsData goodsTagsData = new GoodsTagsData();
+        goodsTagsData.setDatas(list);
+
+        layoutGoodsTag.setGoodsTags(goodsTagsData.getDatas());
 
     }
 
