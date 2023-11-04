@@ -11,6 +11,6 @@ class GoodsTagBean {
 
     /************* 本地变量 ********************/
     //是否展开显示了
-    var isShow: Boolean = true
+    var isExpand: Boolean = true
 
 }

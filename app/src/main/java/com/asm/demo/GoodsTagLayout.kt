@@ -6,28 +6,46 @@ import android.widget.FrameLayout
 import androidx.annotation.NonNull
 
 /**
- * TODO 解决rv中的复用问题可以从数据源解决，比如给adapter设置数据的时候给数据源设置一个本地集合，其中存的就是正在显示的GoodsTagView
- *      这样复用的是view，数据源还是原来的数据源
+ *  解决rv中的复用问题可以从数据源解决，比如给adapter设置数据的时候给数据源设置一个本地集合，其中存的就是正在显示的GoodsTagView
+ *  这样复用的是view，数据源还是原来的数据源
  */
 class GoodsTagLayout @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
 ) : FrameLayout(context, attrs) {
 
-    /** 数据 */
-    private var datas: List<GoodsTagBean>? = null
+    /**
+     * 唯一数据源，指向外界传进来的，保证数据的唯一性，后续始终操作的都是传进来的此数据源，
+     * mExpandingDatas和GoodsTagView存的都是此数据集中的对象
+     */
+    private lateinit var mDatas: List<GoodsTagBean>
 
     /** 显示了信息的view */
-//    val infoShowingViews = mutableListOf<GoodsTagView>()
+    var mExpandingDatas: MutableList<GoodsTagBean>? = null
 
     /**
      * 设置数据
      */
-    fun setGoodsTags(@NonNull datas: List<GoodsTagBean>) {
-        this.datas = datas
-        for (i in datas.indices) {
-            datas[i].isShow = i < 3
+    fun setGoodsTags(@NonNull goodsTagsData: GoodsTagsData) {
+        if (null == goodsTagsData.datas || null == goodsTagsData.showingDatas) {
+            return
+        }
+        mDatas = goodsTagsData.datas!!
+        mExpandingDatas = goodsTagsData.showingDatas
+        //如果是第一次进来，是没有展开的数据的，需要主动往里加
+        if (mExpandingDatas!!.isEmpty()) {
+            for (i in mDatas.indices) {
+                if (mExpandingDatas!!.size >= 3) {
+                    mDatas[i].isExpand = false
+                } else {
+                    mDatas[i].isExpand = true
+                    mExpandingDatas!!.add(mDatas[i])
+                }
+            }
+        }
+        removeAllViews()
+        for (i in mDatas.indices) {
             addView(GoodsTagView(context).apply {
-                data = datas[i]
+                data = mDatas[i]
             })
         }
     }
@@ -64,8 +82,38 @@ class GoodsTagLayout @JvmOverloads constructor(
                     }
 
                     //锚点点击
-                    view.setAnchorClickListener { v, direction, bean ->
+                    view.setAnchorClickListener { _v, _bean ->
+                        if (!::mDatas.isInitialized || null == mExpandingDatas || null == _bean) {
+                            return@setAnchorClickListener
+                        }
+                        //是否为展开状态。如果是展开状态则需要添加进维护的展开集合中
+                        if (_bean.isExpand) {
+                            mExpandingDatas!!.add(_bean)
+                            //超过3个则删除最早的那个
+                            if (mExpandingDatas!!.size > 3) {
+                                mExpandingDatas!!.removeAt(0)
+                            }
+                        } else {
+                            if (mExpandingDatas!!.contains(_bean)) {
+                                mExpandingDatas!!.remove(_bean)
+                            }
+                        }
 
+                        //1.重置是否展开的标识。操作mDatas其实操作的就是视图中的数据
+                        for (i in mDatas.indices) {
+                            mDatas[i].isExpand = mExpandingDatas!!.contains(mDatas[i])
+                        }
+                        //2.根据上面操作后的数据，直接判断是否展开或隐藏就可以
+                        for (i in 0..childCount) {
+                            if (getChildAt(i) is GoodsTagView) {
+                                val view = getChildAt(i) as GoodsTagView
+                                if (view.data!!.isExpand) {
+                                    view.showInfoView()
+                                } else {
+                                    view.hideInfoView()
+                                }
+                            }
+                        }
                     }
 
                 }

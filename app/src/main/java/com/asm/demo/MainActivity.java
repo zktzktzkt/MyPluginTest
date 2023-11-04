@@ -64,21 +64,24 @@ public class MainActivity extends AppCompatActivity {
         GoodsTagsData goodsTagsData = new GoodsTagsData();
         goodsTagsData.setDatas(list);
 
-        layoutGoodsTag.setGoodsTags(goodsTagsData.getDatas());
+        layoutGoodsTag.setGoodsTags(goodsTagsData);
 
+        findViewById(R.id.tv).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //new MainActivity3().test1(MainActivity.this);
+//                StatusBarUtil.setLightMode(MainActivity.this);
+
+                layoutGoodsTag.setGoodsTags(goodsTagsData);
+            }
+        });
     }
 
 
     @Override
     protected void onStart() {
         super.onStart();
-        findViewById(R.id.tv).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                //new MainActivity3().test1(MainActivity.this);
-                StatusBarUtil.setLightMode(MainActivity.this);
-            }
-        });
+
     }
 
     @Override

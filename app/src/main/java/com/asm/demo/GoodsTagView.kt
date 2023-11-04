@@ -11,7 +11,7 @@ class GoodsTagView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
 ) : FrameLayout(context, attrs) {
 
-    private var anchorClicklistener: ((GoodsTagView, String?, GoodsTagBean?) -> Unit)? = null
+    private var anchorClicklistener: ((GoodsTagView, GoodsTagBean?) -> Unit)? = null
     private var llInfo: LinearLayout
 
     private var anchorLeft: View
@@ -70,7 +70,7 @@ class GoodsTagView @JvmOverloads constructor(
         set(value) {
             field = value
             value?.let {
-                if (it.isShow) {
+                if (it.isExpand) {
                     showInfoView()
                 } else {
                     hideInfoView()
@@ -83,7 +83,7 @@ class GoodsTagView @JvmOverloads constructor(
      */
     private fun anchorClick() {
         reverseShowInfoView()
-        anchorClicklistener?.invoke(this, data?.direction, data)
+        anchorClicklistener?.invoke(this, data)
     }
 
     /**
@@ -100,7 +100,7 @@ class GoodsTagView @JvmOverloads constructor(
     /**
      * 显示信息的布局
      */
-    private fun showInfoView() {
+    fun showInfoView() {
         if (null == data) {
             return
         }
@@ -124,7 +124,7 @@ class GoodsTagView @JvmOverloads constructor(
                 anchorView = anchorTop
             }
         }
-        data?.isShow = true
+        data?.isExpand = true
         anchorView?.visibility = VISIBLE
         lineView?.visibility = VISIBLE
         llInfo.visibility = VISIBLE
@@ -134,7 +134,7 @@ class GoodsTagView @JvmOverloads constructor(
     /**
      * 隐藏信息的布局
      */
-    private fun hideInfoView() {
+    fun hideInfoView() {
         if (null == data) {
             return
         }
@@ -158,7 +158,7 @@ class GoodsTagView @JvmOverloads constructor(
                 anchorView = anchorTop
             }
         }
-        data?.isShow = false
+        data?.isExpand = false
         anchorView?.visibility = VISIBLE
         lineView?.visibility = GONE
         llInfo.visibility = GONE
@@ -168,7 +168,7 @@ class GoodsTagView @JvmOverloads constructor(
     /**
      * 设置锚点点击
      */
-    fun setAnchorClickListener(listener: ((GoodsTagView, String?, GoodsTagBean?) -> Unit)?) {
+    fun setAnchorClickListener(listener: ((GoodsTagView, GoodsTagBean?) -> Unit)?) {
         anchorClicklistener = listener
     }
 
