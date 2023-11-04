@@ -11,28 +11,28 @@ class GoodsTagView @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null
 ) : FrameLayout(context, attrs) {
 
+    /** 锚点点击监听 */
     private var anchorClicklistener: ((GoodsTagView, GoodsTagBean?) -> Unit)? = null
+
+    /** 信息的布局 */
     private var llInfo: LinearLayout
 
+    /** 四个方向的锚点 */
     private var anchorLeft: View
     private var anchorTop: View
     private var anchorRight: View
     private var anchorBottom: View
 
+    /** 四个方向的线段 */
     private var lineLeft: View
     private var lineTop: View
     private var lineRight: View
     private var lineBottom: View
 
     /** 锚点宽度 */
-    var anchorWidth: Int
-
-    /** 当前是否展示了信息布局 */
-    private var isShowingInfo: Boolean = false
-        get() = field
-        set(value) {
-            field = value
-        }
+    val anchorWidth: Int by lazy {
+        dp2px(context, 10f)
+    }
 
     init {
         inflate(context, R.layout.view_goodstag, this)
@@ -45,8 +45,6 @@ class GoodsTagView @JvmOverloads constructor(
         lineTop = findViewById(R.id.line_top)
         lineRight = findViewById(R.id.line_right)
         lineBottom = findViewById(R.id.line_bottom)
-
-        anchorWidth = dp2px(context, 10f)
 
         anchorLeft.setOnClickListener {
             anchorClick()
@@ -61,22 +59,6 @@ class GoodsTagView @JvmOverloads constructor(
             anchorClick()
         }
     }
-
-    /**
-     * 数据
-     */
-    var data: GoodsTagBean? = null
-        get() = field
-        set(value) {
-            field = value
-            value?.let {
-                if (it.isExpand) {
-                    showInfoView()
-                } else {
-                    hideInfoView()
-                }
-            }
-        }
 
     /**
      * 锚点点击
@@ -95,6 +77,30 @@ class GoodsTagView @JvmOverloads constructor(
         } else {
             showInfoView()
         }
+    }
+
+
+    /**
+     * 数据
+     */
+    var data: GoodsTagBean? = null
+        get() = field
+        set(value) {
+            field = value
+            value?.let {
+                if (it.isExpand) {
+                    showInfoView()
+                } else {
+                    hideInfoView()
+                }
+            }
+        }
+
+    /**
+     * 设置锚点点击
+     */
+    fun setAnchorClickListener(listener: ((GoodsTagView, GoodsTagBean?) -> Unit)?) {
+        anchorClicklistener = listener
     }
 
     /**
@@ -128,7 +134,6 @@ class GoodsTagView @JvmOverloads constructor(
         anchorView?.visibility = VISIBLE
         lineView?.visibility = VISIBLE
         llInfo.visibility = VISIBLE
-        isShowingInfo = true
     }
 
     /**
@@ -162,14 +167,6 @@ class GoodsTagView @JvmOverloads constructor(
         anchorView?.visibility = VISIBLE
         lineView?.visibility = GONE
         llInfo.visibility = GONE
-        isShowingInfo = false
-    }
-
-    /**
-     * 设置锚点点击
-     */
-    fun setAnchorClickListener(listener: ((GoodsTagView, GoodsTagBean?) -> Unit)?) {
-        anchorClicklistener = listener
     }
 
     fun dp2px(context: Context, dp: Float): Int {
