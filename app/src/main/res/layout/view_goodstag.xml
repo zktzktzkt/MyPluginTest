@@ -12,24 +12,24 @@
         android:layout_height="wrap_content">
 
         <View
-            android:id="@+id/v_anchorLeft"
+            android:id="@+id/v_anchorRight"
             android:layout_width="10dp"
             android:layout_height="10dp"
             android:background="#333333"
             android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@id/line_left"
-            app:layout_constraintRight_toLeftOf="@id/line_left"
-            app:layout_constraintTop_toTopOf="@id/line_left"
+            app:layout_constraintBottom_toBottomOf="@id/line_right"
+            app:layout_constraintRight_toLeftOf="@id/line_right"
+            app:layout_constraintTop_toTopOf="@id/line_right"
             tools:visibility="visible" />
 
         <View
-            android:id="@+id/line_left"
+            android:id="@+id/line_right"
             android:layout_width="15dp"
             android:layout_height="1dp"
             android:background="#333333"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="@id/ll_info"
-            app:layout_constraintLeft_toRightOf="@id/v_anchorLeft"
+            app:layout_constraintLeft_toRightOf="@id/v_anchorRight"
             app:layout_constraintTop_toTopOf="@id/ll_info"
             tools:visibility="visible" />
 
@@ -41,7 +41,7 @@
             android:orientation="vertical"
             android:padding="3dp"
             android:visibility="gone"
-            app:layout_constraintLeft_toRightOf="@id/line_left"
+            app:layout_constraintLeft_toRightOf="@id/line_right"
             app:layout_constraintTop_toBottomOf="@id/line_top"
             tools:visibility="visible">
 
@@ -68,7 +68,7 @@
         </LinearLayout>
 
         <View
-            android:id="@+id/line_right"
+            android:id="@+id/line_left"
             android:layout_width="15dp"
             android:layout_height="1dp"
             android:background="#333333"
@@ -79,14 +79,14 @@
             tools:visibility="visible" />
 
         <View
-            android:id="@+id/v_anchorRight"
+            android:id="@+id/v_anchorLeft"
             android:layout_width="10dp"
             android:layout_height="10dp"
             android:background="#333333"
             android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@id/line_right"
-            app:layout_constraintLeft_toRightOf="@id/line_right"
-            app:layout_constraintTop_toTopOf="@id/line_right"
+            app:layout_constraintBottom_toBottomOf="@id/line_left"
+            app:layout_constraintLeft_toRightOf="@id/line_left"
+            app:layout_constraintTop_toTopOf="@id/line_left"
             tools:visibility="visible" />
 
         <View

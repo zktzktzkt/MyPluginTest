@@ -18,15 +18,15 @@ class GoodsTagView @JvmOverloads constructor(
     private var llInfo: LinearLayout
 
     /** 四个方向的锚点 */
-    private var anchorLeft: View
-    private var anchorTop: View
     private var anchorRight: View
+    private var anchorTop: View
+    private var anchorLeft: View
     private var anchorBottom: View
 
     /** 四个方向的线段 */
-    private var lineLeft: View
-    private var lineTop: View
     private var lineRight: View
+    private var lineTop: View
+    private var lineLeft: View
     private var lineBottom: View
 
     /** 锚点宽度 */
@@ -36,23 +36,25 @@ class GoodsTagView @JvmOverloads constructor(
 
     init {
         inflate(context, R.layout.view_goodstag, this)
+
         llInfo = findViewById(R.id.ll_info)
-        anchorLeft = findViewById(R.id.v_anchorLeft)
-        anchorTop = findViewById(R.id.v_anchorTop)
         anchorRight = findViewById(R.id.v_anchorRight)
+        anchorTop = findViewById(R.id.v_anchorTop)
+        anchorLeft = findViewById(R.id.v_anchorLeft)
         anchorBottom = findViewById(R.id.v_anchorBottom)
-        lineLeft = findViewById(R.id.line_left)
-        lineTop = findViewById(R.id.line_top)
+
         lineRight = findViewById(R.id.line_right)
+        lineTop = findViewById(R.id.line_top)
+        lineLeft = findViewById(R.id.line_left)
         lineBottom = findViewById(R.id.line_bottom)
 
-        anchorLeft.setOnClickListener {
+        anchorRight.setOnClickListener {
             anchorClick()
         }
         anchorTop.setOnClickListener {
             anchorClick()
         }
-        anchorRight.setOnClickListener {
+        anchorLeft.setOnClickListener {
             anchorClick()
         }
         anchorBottom.setOnClickListener {
@@ -114,16 +116,16 @@ class GoodsTagView @JvmOverloads constructor(
         var anchorView: View? = null
         when (data!!.direction) {
             DIRECTION.LEFT.value -> {
-                lineView = lineRight
-                anchorView = anchorRight
+                lineView = lineLeft
+                anchorView = anchorLeft
             }
             DIRECTION.TOP.value -> {
                 lineView = lineBottom
                 anchorView = anchorBottom
             }
             DIRECTION.RIGHT.value -> {
-                lineView = lineLeft
-                anchorView = anchorLeft
+                lineView = lineRight
+                anchorView = anchorRight
             }
             DIRECTION.BOTTOM.value -> {
                 lineView = lineTop
@@ -147,16 +149,16 @@ class GoodsTagView @JvmOverloads constructor(
         var anchorView: View? = null
         when (data!!.direction) {
             DIRECTION.LEFT.value -> {
-                lineView = lineRight
-                anchorView = anchorRight
+                lineView = lineLeft
+                anchorView = anchorLeft
             }
             DIRECTION.TOP.value -> {
                 lineView = lineBottom
                 anchorView = anchorBottom
             }
             DIRECTION.RIGHT.value -> {
-                lineView = lineLeft
-                anchorView = anchorLeft
+                lineView = lineRight
+                anchorView = anchorRight
             }
             DIRECTION.BOTTOM.value -> {
                 lineView = lineTop
