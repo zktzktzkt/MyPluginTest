@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
-apply plugin: 'MyCustomPlugin-local'
+//apply plugin: 'MyCustomPlugin-local'
 
 android {
     compileSdkVersion 32
@@ -32,10 +32,10 @@ android {
 
 }
 
-myExtension {
-    //声明哪些三方库的类需要插桩
-    thirdPackage = ["com/jaeger/library"]
-}
+//myExtension {
+//    //声明哪些三方库的类需要插桩
+//    thirdPackage = ["com/jaeger/library"]
+//}
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
@@ -52,15 +52,20 @@ dependencies {
 class AndroidExt{
 
     int compileSdkVersionExt
-    DefaultConfigExt defaultConfigExt = new DefaultConfigExt()
+    DefaultConfigExt defaultConfigExt
+
+    AndroidExt(Project project) {
+        //ExtensionContainer API 实现嵌套 extension
+        defaultConfigExt = project.extensions.create('defaultConfigExt', DefaultConfigExt.class)
+    }
 
     /**
      * 通过 Action 创建内部 Extension，名称为方法名 defaultConfig
      * @param action 可执行的动作，实质上是一个代码块
      */
-    void defaultConfigExt(Action<DefaultConfigExt> action) {
-        action.execute(defaultConfigExt)
-    }
+//    void defaultConfigExt(Action<DefaultConfigExt> action) {
+//        action.execute(defaultConfigExt)
+//    }
 }
 
 class DefaultConfigExt{
@@ -69,6 +74,16 @@ class DefaultConfigExt{
     int targetSdkVersionExt
     int versionCodeExt
     String versionNameExt
+    UserExt userExt
+
+    DefaultConfigExt(Project project) {
+        //ExtensionContainer API 实现嵌套 extension
+        userExt = project.extensions.create('userExt', UserExt.class)
+    }
+}
+
+class UserExt {
+    String name
 }
 
 //第二步：创建 Extension
@@ -78,11 +93,15 @@ project.extensions.create('androidExt',AndroidExt)
 androidExt {
     compileSdkVersionExt 30
     defaultConfigExt {
-        applicationIdExt = 'com.dream.gradledemo'
-        minSdkVersionExt = 19
-        targetSdkVersionExt = 30
-        versionCodeExt = 1
-        versionNameExt = '1.0'
+        applicationIdExt 'com.dream.gradledemo'
+        minSdkVersionExt 19
+        targetSdkVersionExt 30
+        versionCodeExt 1
+        versionNameExt '1.0'
+
+        userExt {
+            name "张三"
+        }
     }
 }
 
@@ -95,6 +114,7 @@ project.task('testTask'){
         println project.androidExt.defaultConfigExt.targetSdkVersionExt
         println project.androidExt.defaultConfigExt.versionCodeExt
         println project.androidExt.defaultConfigExt.versionNameExt
+        println project.androidExt.defaultConfigExt.userExt.name
     }
 }
 
